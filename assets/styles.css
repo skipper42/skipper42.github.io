@@ -43,11 +43,12 @@ body {
 .img-fluid {
     max-width: 100%;
     height: auto;
+    padding-top: 20px;
 }
 
 @media (max-width: 767px) {
   .img-fluid {
-    max-width: 70%; /* Makes the image smaller on mobile devices */
+    max-width: 60%; /* Makes the image smaller on mobile devices */
     margin: 0 auto; /* Centers the image */
     display: block;
   }
