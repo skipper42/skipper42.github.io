@@ -67,9 +67,6 @@
               <li class="nav-item">
                 <a class="nav-link" href="#scripts">Scripts</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#cisco-secure">Cisco Secure</a>
-              </li>
             </ul>
           </div>
         </div>
@@ -198,18 +195,6 @@
               >Progress Bar</a
             >
             — Simple Progress bar count.
-          </li>
-        </ul>
-      </section>
-
-      <section id="cisco-secure" class="section-border">
-        <h3>Cisco Secure</h3>
-        <ul>
-          <li>
-            <a href="/cisco_secure/secure_workload.html" target="_blank"
-              >Secure Workload</a
-            >
-            — Explore Cisco Secure Workload product details and differentiators.
           </li>
         </ul>
       </section>
