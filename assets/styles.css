@@ -1,4 +1,8 @@
 /* Base Styles */
+html {
+    font-size: 14px; /* Adjust from the default 16px to make text smaller */
+  }
+
 body {
     font-family: 'Ubuntu', sans-serif;
     padding-top: 70px; /* Space for fixed navbar */
