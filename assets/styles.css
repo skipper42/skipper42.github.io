@@ -1,0 +1,64 @@
+/* Base Styles */
+body {
+    font-family: 'Ubuntu', sans-serif;
+    padding-top: 70px; /* Space for fixed navbar */
+    color: #333;
+    background-color: #ffffff;
+    line-height: 1.6;
+  }
+  
+  /* Responsive adjustments for mobile */
+  @media (max-width: 767px) {
+    body {
+      padding-top: 50px;
+    }
+  }
+  
+  /* Section Styling */
+  .section-border {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  /* Footer Styles */
+  footer {
+    background-color: #f8f9fa;
+    margin-top: 30px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-top: 1px solid #ddd;
+  }
+  
+  /* Navbar overrides (optional customization) */
+  .navbar-brand {
+    font-weight: bold;
+  }
+  
+  /* Image Styling */
+  .img-fluid {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  /* Link Styling */
+  a {
+    color: #0066cc;
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Heading styles */
+  h2, h3 {
+    color: #222;
+  }
+  
+  /* List Styles */
+  ul {
+    padding-left: 1.2rem;
+  }
+  
+  /* Additional spacing and utility classes as needed */
