@@ -38,6 +38,25 @@ body {
   .navbar-brand {
     font-weight: bold;
   }
+
+  /* Enhanced Navbar Styling */
+  .navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .navbar-dark .navbar-nav .nav-link {
+    color: #f8f9fa;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .navbar-dark .navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-radius: 4px;
+  }
   
   /* Image Styling */
 .img-fluid {
@@ -49,7 +68,8 @@ body {
 @media (max-width: 767px) {
   .img-fluid {
     max-width: 60%; /* Makes the image smaller on mobile devices */
-    margin: 0 auto; /* Centers the image */
+    float: left;
+    margin-right: 10px;
     display: block;
   }
 }
