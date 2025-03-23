@@ -75,6 +75,29 @@ h3 {
   .navbar-dark .navbar-brand:focus {
     color: #cccccc; /* Slightly darker white for hover/focus state on mobile */
   }
+
+  .navbar-dark .navbar-toggler {
+    border-color: rgba(
+      255,
+      255,
+      255,
+      0.7
+    ); /* Brighter border for visibility on mobile */
+  }
+
+  .navbar-dark .navbar-toggler-icon {
+    filter: brightness(200%); /* Brighter icon for visibility on mobile */
+  }
+
+  .navbar-dark .navbar-toggler:hover,
+  .navbar-dark .navbar-toggler:focus {
+    border-color: rgba(
+      255,
+      255,
+      255,
+      1
+    ); /* Fully white border on hover/focus on mobile */
+  }
 }
 
 .navbar-dark .navbar-nav .nav-link {
