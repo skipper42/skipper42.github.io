@@ -94,3 +94,21 @@ h3 {
 .navbar-dark .navbar-brand:focus {
   color: #cccccc; /* Slightly darker white for navbar brand hover/focus state */
 }
+
+.navbar-dark .navbar-toggler {
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  ); /* Brighter border for better visibility */
+}
+
+.navbar-dark .navbar-toggler-icon {
+  filter: brightness(200%); /* Increase brightness of the hamburger icon */
+}
+
+.navbar-dark .navbar-toggler:hover,
+.navbar-dark .navbar-toggler:focus {
+  border-color: rgba(255, 255, 255, 1); /* Fully white border on hover/focus */
+}
