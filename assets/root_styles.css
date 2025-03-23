@@ -49,3 +49,18 @@ h2,
 h3 {
   color: #222;
 }
+/* Restore responsive and alignment for images */
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+  padding-top: 20px;
+}
+
+@media (max-width: 767px) {
+  .img-fluid {
+    max-width: 60%; /* Smaller image on mobile */
+    float: left; /* Align image to the left */
+    margin-right: 10px;
+    display: block;
+  }
+}
