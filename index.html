@@ -7,7 +7,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/assets/index_styles.css" />
+    <link rel="stylesheet" href="/assets/root_styles.css" />
     <link
       href="https://fonts.googleapis.com/css?family=Ubuntu:400,400i,700"
       rel="stylesheet"
@@ -27,43 +27,6 @@
     <meta property="og:url" content="https://yappit.org/" />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const navLinks = document.querySelectorAll(".navbar-collapse .nav-link");
-      const navbarCollapse = document.querySelector(".navbar-collapse");
-
-      navLinks.forEach(function (link) {
-        link.addEventListener("click", function () {
-          if (navbarCollapse.classList.contains("show")) {
-            new bootstrap.Collapse(navbarCollapse).toggle();
-          }
-        });
-      });
-    });
-  </script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const navLinks = document.querySelectorAll(".navbar-collapse .nav-link");
-      const navbarCollapse = document.querySelector(".navbar-collapse");
-
-      navLinks.forEach(function (link) {
-        link.addEventListener("click", function (e) {
-          const targetId = link.getAttribute("data-target");
-          if (targetId) {
-            e.preventDefault();
-            const targetEl = document.getElementById(targetId);
-            if (targetEl) {
-              targetEl.scrollIntoView({ behavior: "smooth" });
-            }
-          }
-
-          if (navbarCollapse.classList.contains("show")) {
-            new bootstrap.Collapse(navbarCollapse).toggle();
-          }
-        });
-      });
-    });
-  </script>
   <body>
     <!-- BODY STARTS HERE -->
     <header>
@@ -93,6 +56,11 @@
               <li class="nav-item">
                 <a class="nav-link" href="#" data-target="cisco-secure"
                   >Cisco Secure</a
+                >
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="partners.html" target="_blank"
+                  >Partner Lunch and Learn</a
                 >
               </li>
             </ul>
@@ -226,6 +194,16 @@
           </li>
         </ul>
       </section>
+      <section id="partner-lunch-learn" class="section-border">
+        <h3>Partner Lunch and Learn</h3>
+        <p>
+          Check our
+          <a href="/partners.html" target="_blank"
+            >Partner Lunch and Learn sessions</a
+          >
+          for valuable insights and updates.
+        </p>
+      </section>
 
       <section id="cisco-secure" class="section-border">
         <h3>Cisco Secure</h3>
@@ -281,6 +259,7 @@
       </p>
     </footer>
     <!-- BODY ENDS HERE -->
+    <script src="/assets/root_scripts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="application/ld+json">
       {
