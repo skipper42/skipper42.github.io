@@ -82,11 +82,13 @@ h3 {
       255,
       255,
       0.7
-    ); /* Brighter border for visibility on mobile */
+    ) !important; /* Brighter border for visibility on mobile */
   }
 
   .navbar-dark .navbar-toggler-icon {
-    filter: brightness(200%); /* Brighter icon for visibility on mobile */
+    filter: brightness(
+      200%
+    ) !important; /* Brighter icon for visibility on mobile */
   }
 
   .navbar-dark .navbar-toggler:hover,
@@ -96,7 +98,7 @@ h3 {
       255,
       255,
       1
-    ); /* Fully white border on hover/focus on mobile */
+    ) !important; /* Fully white border on hover/focus on mobile */
   }
 }
 
@@ -124,14 +126,21 @@ h3 {
     255,
     255,
     0.7
-  ); /* Brighter border for better visibility */
+  ) !important; /* Brighter border for better visibility */
 }
 
 .navbar-dark .navbar-toggler-icon {
-  filter: brightness(200%); /* Increase brightness of the hamburger icon */
+  filter: brightness(
+    200%
+  ) !important; /* Increase brightness of the hamburger icon */
 }
 
 .navbar-dark .navbar-toggler:hover,
 .navbar-dark .navbar-toggler:focus {
-  border-color: rgba(255, 255, 255, 1); /* Fully white border on hover/focus */
+  border-color: rgba(
+    255,
+    255,
+    255,
+    1
+  ) !important; /* Fully white border on hover/focus */
 }
