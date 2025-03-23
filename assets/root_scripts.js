@@ -18,4 +18,11 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  document.addEventListener("scroll", function () {
+    const navbarCollapse = document.querySelector(".navbar-collapse");
+    if (navbarCollapse && navbarCollapse.classList.contains("show")) {
+      new bootstrap.Collapse(navbarCollapse).hide();
+    }
+  });
 });

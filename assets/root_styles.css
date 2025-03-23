@@ -144,3 +144,30 @@ h3 {
     1
   ) !important; /* Fully white border on hover/focus */
 }
+
+@media (prefers-color-scheme: dark) {
+  .navbar-dark .navbar-nav .nav-link,
+  .navbar-dark .navbar-brand {
+    color: #ffffff !important;
+  }
+
+  .navbar-dark .navbar-nav .nav-link:hover,
+  .navbar-dark .navbar-nav .nav-link:focus,
+  .navbar-dark .navbar-brand:hover,
+  .navbar-dark .navbar-brand:focus {
+    color: #cccccc !important;
+  }
+
+  .navbar-dark .navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.7) !important;
+  }
+
+  .navbar-dark .navbar-toggler-icon {
+    filter: brightness(200%) !important;
+  }
+
+  .navbar-dark .navbar-toggler:hover,
+  .navbar-dark .navbar-toggler:focus {
+    border-color: rgba(255, 255, 255, 1) !important;
+  }
+}
