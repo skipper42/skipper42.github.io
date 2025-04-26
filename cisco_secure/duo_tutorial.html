@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>OpenLDAP and AuthProxy on Debian</title>
+    <title>OpenLDAP and AuthProxy on Debian with Radtest client</title>
     <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
@@ -94,41 +94,42 @@
     </style>
   </head>
   <body>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+      integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+      integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <article class="page sans">
       <header>
         <h1 class="page-title">OpenLDAP and AuthProxy on Debian</h1>
         <p class="page-description"></p>
       </header>
       <div class="page-body">
-        <h3 class="">Assumptions</h3>
-        <p class="">
+        <h3>Assumptions</h3>
+        <p>
           Domain used will be example.com and password will be @H0ME123f and all
           tests are run on Debian OS Bookworm. Debian machine runs on 1 vcpu and
-          2GB RAM.
+          2GB RAM. Radtest will simulate the radius client (like firewall),
+          OpenLDAP will be used to simulate AD.
         </p>
 
-        <h3 class="">Debian</h3>
-        <p class="">
+        <h3>Debian</h3>
+        <p>
           install Debian machine, from
           <a
             href="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.10.0-amd64-gnome.iso"
             >https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.10.0-amd64-gnome.iso</a
           >
         </p>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre class="code"><code class="language-Bash">su - root
+        <pre><code class="language-Bash">su - root
 apt-get update
 apt-get upgrade -y
 systemctl stop ufw
@@ -139,65 +140,25 @@ apt-get install net-tools -y
 apt-get install apache2
 systemctl start apache2
 systemctl enable apache2</code></pre>
-        <h3 class="">phpldapadmin</h3>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre class="code"><code class="language-Bash">su - root
+        <h3>phpldapadmin</h3>
+        <pre><code class="language-Bash">su - root
 apt-get install slapd ldap-utils
 systemctl start slapd
 systemctl enable slapd
 dpkg-reconfigure slapd
 apt-get install phpldapadmin</code></pre>
-        <p class="">edit /etc/phpldapadmin/config.php to be as follows</p>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre
-          class="code"
-        ><code class="language-Bash">$servers-&gt;setValue(&#x27;server&#x27;,&#x27;base&#x27;, array(&#x27;dc=example,dc=com&#x27;));
+        <p>
+          edit /etc/phpldapadmin/config.php to make these 3 lines as below, note
+          that second line will be commented, and thurd line will be uncommented
+        </p>
+        <pre><code class="language-Bash">$servers-&gt;setValue(&#x27;server&#x27;,&#x27;base&#x27;, array(&#x27;dc=example,dc=com&#x27;));
 #$servers-&gt;setValue(&#x27;login&#x27;,&#x27;bind_id&#x27;,&#x27;cn=admin,dc=example,dc=com&#x27;);
 $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</code></pre>
-        <p class="">
+        <p>
           replace /etc/phpldapadmin/templates/creation/posixGroup.xml with the
           below
         </p>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre
-          class="code"
-        ><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        <pre><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;!DOCTYPE template SYSTEM &quot;template.dtd&quot;&gt;
 &lt;template&gt;
   &lt;askcontainer&gt;1&lt;/askcontainer&gt;
@@ -228,26 +189,11 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
   &lt;/attributes&gt;
 &lt;/template&gt;
 </code></pre>
-        <p class="">
+        <p>
           replace /etc/phpldapadmin/templates/creation/posixAccount.xml with the
           below
         </p>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre
-          class="code"
-        ><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+        <pre><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;!DOCTYPE template SYSTEM &quot;../template.dtd&quot;&gt;
 
 &lt;template&gt;
@@ -340,24 +286,9 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
 
 &lt;/template&gt;
 </code></pre>
-        <h3 class="">Create OpenLDAP OU, Group and Users</h3>
-        <p class="">in openldap create LDIF as below</p>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre
-          class="code"
-        ><code class="language-Bash"># LDIF Export for dc=example,dc=com
+        <h3>Create OpenLDAP OU, Group and Users</h3>
+        <p>in openldap create LDIF as below</p>
+        <pre><code class="language-Bash"># LDIF Export for dc=example,dc=com
 # Server: My LDAP Server (127.0.0.1)
 # Search Scope: sub
 # Search Filter: (objectClass=*)
@@ -413,21 +344,8 @@ userpassword: {MD5}z/MPgQifZ7M6lGWQDP0z1g==
               src="/assets/screenshots/ldap_server.png"
           /></a>
         </figure>
-        <h3 class="">Duo</h3>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre class="code"><code class="language-Bash">su - root
+        <h3>Duo</h3>
+        <pre><code class="language-Bash">su - root
 apt-get install build-essential libffi-dev zlib1g-dev
 cd /root
 wget --content-disposition https://dl.duosecurity.com/duoauthproxy-latest-src.tgz
@@ -436,24 +354,11 @@ cd duoauthproxy-version-src
 make
 cd duoauthproxy-build
 ./install  --install-dir /opt/duoauthproxy --service-user duo_authproxy_svc --log-group duo_authproxy_grp --create-init-script yes</code></pre>
-        <p class="">
+        <p>
           add the External Directory as openldap in Duo admin panel, the conf
           file /opt/duoauthproxy/conf/authproxy.cfg should be as below
         </p>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre class="code"><code class="language-Bash">[cloud]
+        <pre><code class="language-Bash">[cloud]
 ikey=PASTE HERE
 skey=PASTE HERE
 api_host=PASTE HERE
@@ -472,60 +377,17 @@ search_dn=dc=example,dc=com
 username_attribute=uid
 ssl_verify_hostname=false
 transport=clear</code></pre>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre
-          class="code"
-        ><code class="language-Bash">/opt/duoauthproxy/bin/authproxyctl restart</code></pre>
-        <h3 class="">Install Radius Client</h3>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre
-          class="code"
-        ><code class="language-Bash">apt-get install freeradius-utils
+        <pre><code class="language-Bash">/opt/duoauthproxy/bin/authproxyctl restart</code></pre>
+        <h3>Install Radius Client</h3>
+        <pre><code class="language-Bash">apt-get install freeradius-utils
 </code></pre>
-        <h3 class="">Create a Duo application for the radius client</h3>
-        <p class="">
+        <h3>Create a Duo application for the radius client</h3>
+        <p>
           create a new Application in Duo admin panel with type “RADIUS”, add
           the [radius_server_auto] section in
           /opt/duoauthproxy/conf/authproxy.cfg
         </p>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre class="code"><code class="language-Bash">[radius_server_auto]
+        <pre><code class="language-Bash">[radius_server_auto]
 ikey=PASTE HERE
 skey=PASTE HERE
 api_host=PASTE HERE
@@ -534,46 +396,14 @@ radius_secret_1=cisco
 failmode=safe
 client=ad_client
 port=1812</code></pre>
-        <h3 class="">Test Radius client</h3>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre
-          class="code"
-        ><code class="language-Bash">radtest akramhamed @H0ME123f 127.0.0.1 1812 cisco</code></pre>
-        <p class=""></p>
-        <h3 class="">Test tools</h3>
-        <script
-          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        ></script>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-          crossorigin="anonymous"
-          referrerpolicy="no-referrer"
-        />
-        <pre
-          class="code"
-        ><code class="language-Bash">ldapwhoami -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27;
+        <h3>Test Radius client</h3>
+        <pre><code class="language-Bash">radtest akramhamed @H0ME123f 127.0.0.1 1812 cisco</code></pre>
+        <h3>Test tools</h3>
+        <pre><code class="language-Bash">ldapwhoami -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27;
 ldapsearch -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27; -b &quot;dc=example,dc=com&quot;
 root@debian:~# ldapwhoami -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27;
 radtest akramhamed @H0ME123f 127.0.0.1 1812 cisco</code></pre>
       </div>
     </article>
-    <span class="sans" style="font-size: 14px; padding-top: 2em"></span>
   </body>
 </html>
