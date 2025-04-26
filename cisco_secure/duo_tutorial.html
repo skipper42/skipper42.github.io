@@ -87,6 +87,9 @@
 
       p {
         margin: 1rem 0;
+        font-size: 13px;
+        font-family: monospace;
+        color: #0070f3;
       }
     </style>
   </head>
@@ -100,7 +103,8 @@
         <h3 class="">Assumptions</h3>
         <p class="">
           Domain used will be example.com and password will be @H0ME123f and all
-          tests are run on Debian OS Bookworm.
+          tests are run on Debian OS Bookworm. Debian machine runs on 1 vcpu and
+          2GB RAM.
         </p>
 
         <h3 class="">Debian</h3>
@@ -452,7 +456,7 @@ cd duoauthproxy-build
         <pre class="code"><code class="language-Bash">[cloud]
 ikey=PASTE HERE
 skey=PASTE HERE
-api_host=api-b2838f1a.duosecurity.com
+api_host=PASTE HERE
 service_account_username=cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com
 service_account_password=@H0ME123f
 
@@ -524,7 +528,7 @@ transport=clear</code></pre>
         <pre class="code"><code class="language-Bash">[radius_server_auto]
 ikey=PASTE HERE
 skey=PASTE HERE
-api_host=api-b2838f1a.duosecurity.com
+api_host=PASTE HERE
 radius_ip_1=127.0.0.1
 radius_secret_1=cisco
 failmode=safe
