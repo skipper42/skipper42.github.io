@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>OpenLDAP and AuthProxy on Debian</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        background-color: #f7f8fa;
+        color: #333;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #2e2e2e;
+      }
+      pre {
+        background: #eee;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+      }
+      code {
+        font-family: "Courier New", Courier, monospace;
+      }
+      section {
+        margin-bottom: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>OpenLDAP and AuthProxy on Debian</h1>
+
+    <section>
+      <h2>Debian</h2>
+      <p>
+        Install Debian machine from
+        <a
+          href="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.10.0-amd64-gnome.iso"
+          target="_blank"
+          >here</a
+        >.
+      </p>
+      <pre><code>su - root
+apt-get update
+apt-get upgrade -y
+systemctl stop ufw
+systemctl disable ufw
+systemctl stop apparmor
+systemctl disable apparmor.service
+apt-get install net-tools -y
+apt-get install apache2
+systemctl start apache2
+systemctl enable apache2
+</code></pre>
+    </section>
+
+    <section>
+      <h2>PHPldapadmin</h2>
+      <pre><code>su - root
+apt-get install slapd ldap-utils
+systemctl start slapd
+systemctl enable slapd
+dpkg-reconfigure slapd
+apt-get install phpldapadmin
+</code></pre>
+
+      <p>Edit <code>/etc/phpldapadmin/config.php</code>:</p>
+      <pre><code>$servers-&gt;setValue('server','base', array('dc=example,dc=com'));
+#$servers-&gt;setValue('login','bind_id','cn=admin,dc=example,dc=com');
+$config-&gt;custom-&gt;appearance['hide_template_warning'] = true;
+</code></pre>
+
+      <p>
+        Replace
+        <code>/etc/phpldapadmin/templates/creation/posixGroup.xml</code>:
+      </p>
+      <pre><code>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;!DOCTYPE template SYSTEM "template.dtd"&gt;
+&lt;template&gt;
+  &lt;askcontainer&gt;1&lt;/askcontainer&gt;
+  &lt;description&gt;New groupOfNames Group&lt;/description&gt;
+  &lt;icon&gt;ldap-ou.png&lt;/icon&gt;
+  ...
+&lt;/template&gt;
+</code></pre>
+
+      <p>
+        Replace
+        <code>/etc/phpldapadmin/templates/creation/posixAccount.xml</code>:
+      </p>
+      <pre><code>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+&lt;!DOCTYPE template SYSTEM "../template.dtd"&gt;
+&lt;template&gt;
+  &lt;askcontainer&gt;1&lt;/askcontainer&gt;
+  &lt;description&gt;New User Account&lt;/description&gt;
+  &lt;icon&gt;ldap-user.png&lt;/icon&gt;
+  ...
+&lt;/template&gt;
+</code></pre>
+    </section>
+
+    <section>
+      <h2>Create OpenLDAP OU, Group and Users</h2>
+      <p>Create an LDIF file with the following content:</p>
+      <pre><code>version: 1
+
+dn: dc=example,dc=com
+dc: example
+o: example
+objectclass: top
+objectclass: dcObject
+objectclass: organization
+
+dn: ou=users,dc=example,dc=com
+objectclass: organizationalUnit
+objectclass: top
+ou: users
+
+dn: cn=duousers,ou=users,dc=example,dc=com
+cn: duousers
+member: cn=akram hamed,cn=duousers,ou=users,dc=example,dc=com
+member: cn=test test,cn=duousers,ou=users,dc=example,dc=com
+objectclass: groupOfNames
+objectclass: top
+
+dn: cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com
+cn: Akram Hamed
+gidnumber: 10001
+givenname: akram
+homedirectory: /home/users/akramhamed
+loginshell: /bin/bash
+mail: your@email.com
+objectclass: inetOrgPerson
+objectclass: posixAccount
+objectclass: top
+sn: hamed
+uid: akramhamed
+uidnumber: 10002
+userpassword: {MD5}z/MPgQifZ7M6lGWQDP0z1g==
+</code></pre>
+    </section>
+
+    <section>
+      <h2>Duo</h2>
+      <pre><code>su - root
+apt-get install build-essential libffi-dev zlib1g-dev
+cd /root
+</code></pre>
+    </section>
+  </body>
+</html>
