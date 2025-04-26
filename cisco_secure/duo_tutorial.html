@@ -1,48 +1,823 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>OpenLDAP and AuthProxy on Debian</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 40px;
-        background-color: #f7f8fa;
-        color: #333;
+      /* cspell:disable-file */
+      /* webkit printing magic: print all background colors */
+      html {
+        -webkit-print-color-adjust: exact;
       }
+      * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      @media only screen {
+        body {
+          margin: 2em auto;
+          max-width: 900px;
+          color: rgb(55, 53, 47);
+        }
+      }
+
+      body {
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
+      a,
+      a.visited {
+        color: inherit;
+        text-decoration: underline;
+      }
+
+      .pdf-relative-link-path {
+        font-size: 80%;
+        color: #444;
+      }
+
       h1,
       h2,
       h3 {
-        color: #2e2e2e;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        font-weight: 600;
+        margin-bottom: 0;
       }
-      pre {
-        background: #eee;
-        padding: 10px;
-        border-radius: 5px;
-        overflow-x: auto;
+
+      .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 0.75em;
       }
+
+      h1 {
+        font-size: 1.875rem;
+        margin-top: 1.875rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+        margin-top: 1.5rem;
+      }
+
+      h3 {
+        font-size: 1.25rem;
+        margin-top: 1.25rem;
+      }
+
+      .source {
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 1.5em;
+        word-break: break-all;
+      }
+
+      .callout {
+        border-radius: 3px;
+        padding: 1rem;
+      }
+
+      figure {
+        margin: 1.25em 0;
+        page-break-inside: avoid;
+      }
+
+      figcaption {
+        opacity: 0.5;
+        font-size: 85%;
+        margin-top: 0.5em;
+      }
+
+      mark {
+        background-color: transparent;
+      }
+
+      .indented {
+        padding-left: 1.5em;
+      }
+
+      hr {
+        background: transparent;
+        display: block;
+        width: 100%;
+        height: 1px;
+        visibility: visible;
+        border: none;
+        border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+      }
+
+      img {
+        max-width: 100%;
+      }
+
+      @media only print {
+        img {
+          max-height: 100vh;
+          object-fit: contain;
+        }
+      }
+
+      @page {
+        margin: 1in;
+      }
+
+      .collection-content {
+        font-size: 0.875rem;
+      }
+
+      .column-list {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .column {
+        padding: 0 1em;
+      }
+
+      .column:first-child {
+        padding-left: 0;
+      }
+
+      .column:last-child {
+        padding-right: 0;
+      }
+
+      .table_of_contents-item {
+        display: block;
+        font-size: 0.875rem;
+        line-height: 1.3;
+        padding: 0.125rem;
+      }
+
+      .table_of_contents-indent-1 {
+        margin-left: 1.5rem;
+      }
+
+      .table_of_contents-indent-2 {
+        margin-left: 3rem;
+      }
+
+      .table_of_contents-indent-3 {
+        margin-left: 4.5rem;
+      }
+
+      .table_of_contents-link {
+        text-decoration: none;
+        opacity: 0.7;
+        border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+      }
+
+      table,
+      th,
+      td {
+        border: 1px solid rgba(55, 53, 47, 0.09);
+        border-collapse: collapse;
+      }
+
+      table {
+        border-left: none;
+        border-right: none;
+      }
+
+      th,
+      td {
+        font-weight: normal;
+        padding: 0.25em 0.5em;
+        line-height: 1.5;
+        min-height: 1.5em;
+        text-align: left;
+      }
+
+      th {
+        color: rgba(55, 53, 47, 0.6);
+      }
+
+      ol,
+      ul {
+        margin: 0;
+        margin-block-start: 0.6em;
+        margin-block-end: 0.6em;
+      }
+
+      li > ol:first-child,
+      li > ul:first-child {
+        margin-block-start: 0.6em;
+      }
+
+      ul > li {
+        list-style: disc;
+      }
+
+      ul.to-do-list {
+        padding-inline-start: 0;
+      }
+
+      ul.to-do-list > li {
+        list-style: none;
+      }
+
+      .to-do-children-checked {
+        text-decoration: line-through;
+        opacity: 0.375;
+      }
+
+      ul.toggle > li {
+        list-style: none;
+      }
+
+      ul {
+        padding-inline-start: 1.7em;
+      }
+
+      ul > li {
+        padding-left: 0.1em;
+      }
+
+      ol {
+        padding-inline-start: 1.6em;
+      }
+
+      ol > li {
+        padding-left: 0.2em;
+      }
+
+      .mono ol {
+        padding-inline-start: 2em;
+      }
+
+      .mono ol > li {
+        text-indent: -0.4em;
+      }
+
+      .toggle {
+        padding-inline-start: 0em;
+        list-style-type: none;
+      }
+
+      /* Indent toggle children */
+      .toggle > li > details {
+        padding-left: 1.7em;
+      }
+
+      .toggle > li > details > summary {
+        margin-left: -1.1em;
+      }
+
+      .selected-value {
+        display: inline-block;
+        padding: 0 0.5em;
+        background: rgba(206, 205, 202, 0.5);
+        border-radius: 3px;
+        margin-right: 0.5em;
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+        white-space: nowrap;
+      }
+
+      .collection-title {
+        display: inline-block;
+        margin-right: 1em;
+      }
+
+      .page-description {
+        margin-bottom: 2em;
+      }
+
+      .simple-table {
+        margin-top: 1em;
+        font-size: 0.875rem;
+        empty-cells: show;
+      }
+      .simple-table td {
+        height: 29px;
+        min-width: 120px;
+      }
+
+      .simple-table th {
+        height: 29px;
+        min-width: 120px;
+      }
+
+      .simple-table-header-color {
+        background: rgb(247, 246, 243);
+        color: black;
+      }
+      .simple-table-header {
+        font-weight: 500;
+      }
+
+      time {
+        opacity: 0.5;
+      }
+
+      .icon {
+        display: inline-block;
+        max-width: 1.2em;
+        max-height: 1.2em;
+        text-decoration: none;
+        vertical-align: text-bottom;
+        margin-right: 0.5em;
+      }
+
+      img.icon {
+        border-radius: 3px;
+      }
+
+      .user-icon {
+        width: 1.5em;
+        height: 1.5em;
+        border-radius: 100%;
+        margin-right: 0.5rem;
+      }
+
+      .user-icon-inner {
+        font-size: 0.8em;
+      }
+
+      .text-icon {
+        border: 1px solid #000;
+        text-align: center;
+      }
+
+      .page-cover-image {
+        display: block;
+        object-fit: cover;
+        width: 100%;
+        max-height: 30vh;
+      }
+
+      .page-header-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      .page-header-icon-with-cover {
+        margin-top: -0.72em;
+        margin-left: 0.07em;
+      }
+
+      .page-header-icon img {
+        border-radius: 3px;
+      }
+
+      .link-to-page {
+        margin: 1em 0;
+        padding: 0;
+        border: none;
+        font-weight: 500;
+      }
+
+      p > .user {
+        opacity: 0.5;
+      }
+
+      td > .user,
+      td > time {
+        white-space: nowrap;
+      }
+
+      input[type="checkbox"] {
+        transform: scale(1.5);
+        margin-right: 0.6em;
+        vertical-align: middle;
+      }
+
+      p {
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+      }
+
+      .image {
+        border: none;
+        margin: 1.5em 0;
+        padding: 0;
+        border-radius: 0;
+        text-align: center;
+      }
+
+      .code,
       code {
-        font-family: "Courier New", Courier, monospace;
+        background: rgba(135, 131, 120, 0.15);
+        border-radius: 3px;
+        padding: 0.2em 0.4em;
+        border-radius: 3px;
+        font-size: 85%;
+        tab-size: 2;
       }
-      section {
-        margin-bottom: 40px;
+
+      code {
+        color: #eb5757;
+      }
+
+      .code {
+        padding: 1.5em 1em;
+      }
+
+      .code-wrap {
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .code > code {
+        background: none;
+        padding: 0;
+        font-size: 100%;
+        color: inherit;
+      }
+
+      blockquote {
+        font-size: 1.25em;
+        margin: 1em 0;
+        padding-left: 1em;
+        border-left: 3px solid rgb(55, 53, 47);
+      }
+
+      .bookmark {
+        text-decoration: none;
+        max-height: 8em;
+        padding: 0;
+        display: flex;
+        width: 100%;
+        align-items: stretch;
+      }
+
+      .bookmark-title {
+        font-size: 0.85em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 1.75em;
+        white-space: nowrap;
+      }
+
+      .bookmark-text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .bookmark-info {
+        flex: 4 1 180px;
+        padding: 12px 14px 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .bookmark-image {
+        width: 33%;
+        flex: 1 1 180px;
+        display: block;
+        position: relative;
+        object-fit: cover;
+        border-radius: 1px;
+      }
+
+      .bookmark-description {
+        color: rgba(55, 53, 47, 0.6);
+        font-size: 0.75em;
+        overflow: hidden;
+        max-height: 4.5em;
+        word-break: break-word;
+      }
+
+      .bookmark-href {
+        font-size: 0.75em;
+        margin-top: 0.25em;
+      }
+
+      .sans {
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI Variable Display", "Segoe UI", Helvetica,
+          "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+          "Segoe UI Symbol";
+      }
+      .code {
+        font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono",
+          "Liberation Mono", Courier, monospace;
+      }
+      .serif {
+        font-family: Lyon-Text, Georgia, ui-serif, serif;
+      }
+      .mono {
+        font-family: iawriter-mono, Nitti, Menlo, Courier, monospace;
+      }
+      .pdf .sans {
+        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI Variable Display", "Segoe UI", Helvetica,
+          "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+          "Segoe UI Symbol", "Twemoji", "Noto Color Emoji", "Noto Sans CJK JP";
+      }
+      .pdf:lang(zh-CN) .sans {
+        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI Variable Display", "Segoe UI", Helvetica,
+          "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+          "Segoe UI Symbol", "Twemoji", "Noto Color Emoji", "Noto Sans CJK SC";
+      }
+      .pdf:lang(zh-TW) .sans {
+        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI Variable Display", "Segoe UI", Helvetica,
+          "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+          "Segoe UI Symbol", "Twemoji", "Noto Color Emoji", "Noto Sans CJK TC";
+      }
+      .pdf:lang(ko-KR) .sans {
+        font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI Variable Display", "Segoe UI", Helvetica,
+          "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+          "Segoe UI Symbol", "Twemoji", "Noto Color Emoji", "Noto Sans CJK KR";
+      }
+      .pdf .code {
+        font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas,
+          "PT Mono", "Liberation Mono", Courier, monospace, "Twemoji",
+          "Noto Color Emoji", "Noto Sans Mono CJK JP";
+      }
+      .pdf:lang(zh-CN) .code {
+        font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas,
+          "PT Mono", "Liberation Mono", Courier, monospace, "Twemoji",
+          "Noto Color Emoji", "Noto Sans Mono CJK SC";
+      }
+      .pdf:lang(zh-TW) .code {
+        font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas,
+          "PT Mono", "Liberation Mono", Courier, monospace, "Twemoji",
+          "Noto Color Emoji", "Noto Sans Mono CJK TC";
+      }
+      .pdf:lang(ko-KR) .code {
+        font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas,
+          "PT Mono", "Liberation Mono", Courier, monospace, "Twemoji",
+          "Noto Color Emoji", "Noto Sans Mono CJK KR";
+      }
+      .pdf .serif {
+        font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, "Twemoji",
+          "Noto Color Emoji", "Noto Serif CJK JP";
+      }
+      .pdf:lang(zh-CN) .serif {
+        font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, "Twemoji",
+          "Noto Color Emoji", "Noto Serif CJK SC";
+      }
+      .pdf:lang(zh-TW) .serif {
+        font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, "Twemoji",
+          "Noto Color Emoji", "Noto Serif CJK TC";
+      }
+      .pdf:lang(ko-KR) .serif {
+        font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, "Twemoji",
+          "Noto Color Emoji", "Noto Serif CJK KR";
+      }
+      .pdf .mono {
+        font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace,
+          "Twemoji", "Noto Color Emoji", "Noto Sans Mono CJK JP";
+      }
+      .pdf:lang(zh-CN) .mono {
+        font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace,
+          "Twemoji", "Noto Color Emoji", "Noto Sans Mono CJK SC";
+      }
+      .pdf:lang(zh-TW) .mono {
+        font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace,
+          "Twemoji", "Noto Color Emoji", "Noto Sans Mono CJK TC";
+      }
+      .pdf:lang(ko-KR) .mono {
+        font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace,
+          "Twemoji", "Noto Color Emoji", "Noto Sans Mono CJK KR";
+      }
+      .highlight-default {
+        color: rgba(50, 48, 44, 1);
+      }
+      .highlight-gray {
+        color: rgba(120, 119, 116, 1);
+        fill: rgba(120, 119, 116, 1);
+      }
+      .highlight-brown {
+        color: rgba(159, 107, 83, 1);
+        fill: rgba(159, 107, 83, 1);
+      }
+      .highlight-orange {
+        color: rgba(217, 115, 13, 1);
+        fill: rgba(217, 115, 13, 1);
+      }
+      .highlight-yellow {
+        color: rgba(203, 145, 47, 1);
+        fill: rgba(203, 145, 47, 1);
+      }
+      .highlight-teal {
+        color: rgba(68, 131, 97, 1);
+        fill: rgba(68, 131, 97, 1);
+      }
+      .highlight-blue {
+        color: rgba(51, 126, 169, 1);
+        fill: rgba(51, 126, 169, 1);
+      }
+      .highlight-purple {
+        color: rgba(144, 101, 176, 1);
+        fill: rgba(144, 101, 176, 1);
+      }
+      .highlight-pink {
+        color: rgba(193, 76, 138, 1);
+        fill: rgba(193, 76, 138, 1);
+      }
+      .highlight-red {
+        color: rgba(212, 76, 71, 1);
+        fill: rgba(212, 76, 71, 1);
+      }
+      .highlight-default_background {
+        color: rgba(50, 48, 44, 1);
+      }
+      .highlight-gray_background {
+        background: rgba(248, 248, 247, 1);
+      }
+      .highlight-brown_background {
+        background: rgba(244, 238, 238, 1);
+      }
+      .highlight-orange_background {
+        background: rgba(251, 236, 221, 1);
+      }
+      .highlight-yellow_background {
+        background: rgba(251, 243, 219, 1);
+      }
+      .highlight-teal_background {
+        background: rgba(237, 243, 236, 1);
+      }
+      .highlight-blue_background {
+        background: rgba(231, 243, 248, 1);
+      }
+      .highlight-purple_background {
+        background: rgba(248, 243, 252, 1);
+      }
+      .highlight-pink_background {
+        background: rgba(252, 241, 246, 1);
+      }
+      .highlight-red_background {
+        background: rgba(253, 235, 236, 1);
+      }
+      .block-color-default {
+        color: inherit;
+        fill: inherit;
+      }
+      .block-color-gray {
+        color: rgba(120, 119, 116, 1);
+        fill: rgba(120, 119, 116, 1);
+      }
+      .block-color-brown {
+        color: rgba(159, 107, 83, 1);
+        fill: rgba(159, 107, 83, 1);
+      }
+      .block-color-orange {
+        color: rgba(217, 115, 13, 1);
+        fill: rgba(217, 115, 13, 1);
+      }
+      .block-color-yellow {
+        color: rgba(203, 145, 47, 1);
+        fill: rgba(203, 145, 47, 1);
+      }
+      .block-color-teal {
+        color: rgba(68, 131, 97, 1);
+        fill: rgba(68, 131, 97, 1);
+      }
+      .block-color-blue {
+        color: rgba(51, 126, 169, 1);
+        fill: rgba(51, 126, 169, 1);
+      }
+      .block-color-purple {
+        color: rgba(144, 101, 176, 1);
+        fill: rgba(144, 101, 176, 1);
+      }
+      .block-color-pink {
+        color: rgba(193, 76, 138, 1);
+        fill: rgba(193, 76, 138, 1);
+      }
+      .block-color-red {
+        color: rgba(212, 76, 71, 1);
+        fill: rgba(212, 76, 71, 1);
+      }
+      .block-color-default_background {
+        color: inherit;
+        fill: inherit;
+      }
+      .block-color-gray_background {
+        background: rgba(248, 248, 247, 1);
+      }
+      .block-color-brown_background {
+        background: rgba(244, 238, 238, 1);
+      }
+      .block-color-orange_background {
+        background: rgba(251, 236, 221, 1);
+      }
+      .block-color-yellow_background {
+        background: rgba(251, 243, 219, 1);
+      }
+      .block-color-teal_background {
+        background: rgba(237, 243, 236, 1);
+      }
+      .block-color-blue_background {
+        background: rgba(231, 243, 248, 1);
+      }
+      .block-color-purple_background {
+        background: rgba(248, 243, 252, 1);
+      }
+      .block-color-pink_background {
+        background: rgba(252, 241, 246, 1);
+      }
+      .block-color-red_background {
+        background: rgba(253, 235, 236, 1);
+      }
+      .select-value-color-uiBlue {
+        background-color: undefined;
+      }
+      .select-value-color-pink {
+        background-color: rgba(225, 136, 179, 0.27);
+      }
+      .select-value-color-purple {
+        background-color: rgba(168, 129, 197, 0.27);
+      }
+      .select-value-color-green {
+        background-color: rgba(123, 183, 129, 0.27);
+      }
+      .select-value-color-gray {
+        background-color: rgba(84, 72, 49, 0.15);
+      }
+      .select-value-color-transparentGray {
+        background-color: undefined;
+      }
+      .select-value-color-translucentGray {
+        background-color: undefined;
+      }
+      .select-value-color-orange {
+        background-color: rgba(224, 124, 57, 0.27);
+      }
+      .select-value-color-brown {
+        background-color: rgba(210, 162, 141, 0.35);
+      }
+      .select-value-color-red {
+        background-color: rgba(244, 171, 159, 0.4);
+      }
+      .select-value-color-yellow {
+        background-color: rgba(236, 191, 66, 0.39);
+      }
+      .select-value-color-blue {
+        background-color: rgba(93, 165, 206, 0.27);
+      }
+      .select-value-color-pageGlass {
+        background-color: undefined;
+      }
+      .select-value-color-washGlass {
+        background-color: undefined;
+      }
+
+      .checkbox {
+        display: inline-flex;
+        vertical-align: text-bottom;
+        width: 16;
+        height: 16;
+        background-size: 16px;
+        margin-left: 2px;
+        margin-right: 5px;
+      }
+
+      .checkbox-on {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+      }
+
+      .checkbox-off {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
       }
     </style>
   </head>
   <body>
-    <h1>OpenLDAP and AuthProxy on Debian</h1>
-
-    <section>
-      <h2>Debian</h2>
-      <p>
-        Install Debian machine from
-        <a
-          href="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.10.0-amd64-gnome.iso"
-          target="_blank"
-          >here</a
-        >.
-      </p>
-      <pre><code>su - root
+    <article id="1e137867-803f-80f8-abb1-ef2ca8f3190b" class="page sans">
+      <header>
+        <h1 class="page-title">OpenLDAP and AuthProxy on Debian</h1>
+        <p class="page-description"></p>
+      </header>
+      <div class="page-body">
+        <h3 id="1e137867-803f-804c-b9c1-d4f70257a9d0" class="">Debian</h3>
+        <p id="1e137867-803f-80bb-b4e1-fde2c4c886e9" class="">
+          install Debian machine, from
+          <a
+            href="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.10.0-amd64-gnome.iso"
+            >https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.10.0-amd64-gnome.iso</a
+          >
+        </p>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-8083-9279-e95bad48f830"
+          class="code"
+        ><code class="language-Bash">su - root
 apt-get update
 apt-get upgrade -y
 systemctl stop ufw
@@ -52,60 +827,250 @@ systemctl disable apparmor.service
 apt-get install net-tools -y
 apt-get install apache2
 systemctl start apache2
-systemctl enable apache2
-</code></pre>
-    </section>
-
-    <section>
-      <h2>PHPldapadmin</h2>
-      <pre><code>su - root
+systemctl enable apache2</code></pre>
+        <h3 id="1e137867-803f-805c-9ebf-ed84d065df6b" class="">PHPldapadmin</h3>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-80d9-9d8f-f748a3e9194e"
+          class="code"
+        ><code class="language-Bash">su - root
 apt-get install slapd ldap-utils
 systemctl start slapd
 systemctl enable slapd
 dpkg-reconfigure slapd
-apt-get install phpldapadmin
-</code></pre>
-
-      <p>Edit <code>/etc/phpldapadmin/config.php</code>:</p>
-      <pre><code>$servers-&gt;setValue('server','base', array('dc=example,dc=com'));
-#$servers-&gt;setValue('login','bind_id','cn=admin,dc=example,dc=com');
-$config-&gt;custom-&gt;appearance['hide_template_warning'] = true;
-</code></pre>
-
-      <p>
-        Replace
-        <code>/etc/phpldapadmin/templates/creation/posixGroup.xml</code>:
-      </p>
-      <pre><code>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
-&lt;!DOCTYPE template SYSTEM "template.dtd"&gt;
+apt-get install phpldapadmin</code></pre>
+        <p id="1e137867-803f-80cb-813c-f4a9566475ef" class="">
+          edit /etc/phpldapadmin/config.php to be as follows
+        </p>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-8051-8274-ca47e6945189"
+          class="code"
+        ><code class="language-Bash">$servers-&gt;setValue(&#x27;server&#x27;,&#x27;base&#x27;, array(&#x27;dc=example,dc=com&#x27;));
+#$servers-&gt;setValue(&#x27;login&#x27;,&#x27;bind_id&#x27;,&#x27;cn=admin,dc=example,dc=com&#x27;);
+$config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</code></pre>
+        <p id="1e137867-803f-804e-a448-ca7972ab9bff" class="">
+          replace /etc/phpldapadmin/templates/creation/posixGroup.xml with the
+          below
+        </p>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-80e6-8783-da8532cf490f"
+          class="code"
+        ><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;!DOCTYPE template SYSTEM &quot;template.dtd&quot;&gt;
 &lt;template&gt;
   &lt;askcontainer&gt;1&lt;/askcontainer&gt;
   &lt;description&gt;New groupOfNames Group&lt;/description&gt;
   &lt;icon&gt;ldap-ou.png&lt;/icon&gt;
-  ...
+  &lt;invalid&gt;0&lt;/invalid&gt;
+  &lt;rdn&gt;cn&lt;/rdn&gt;
+  &lt;title&gt;Generic: groupOfNames Group&lt;/title&gt;
+  &lt;visible&gt;1&lt;/visible&gt;
+
+  &lt;objectClasses&gt;
+    &lt;objectClass id=&quot;groupOfNames&quot; /&gt;
+  &lt;/objectClasses&gt;
+
+  &lt;attributes&gt;
+    &lt;attribute id=&quot;cn&quot;&gt;
+      &lt;display&gt;Group Name&lt;/display&gt;
+      &lt;order&gt;1&lt;/order&gt;
+      &lt;page&gt;1&lt;/page&gt;
+    &lt;/attribute&gt;
+
+    &lt;attribute id=&quot;member&quot;&gt;
+      &lt;display&gt;Members&lt;/display&gt;
+      &lt;order&gt;2&lt;/order&gt;
+      &lt;page&gt;1&lt;/page&gt;
+      &lt;value&gt;&lt;![CDATA[=php.MultiList(/;(&amp;(objectClass=inetOrgPerson));dn;%cn% (%uid%)]]&gt;&lt;/value&gt;
+    &lt;/attribute&gt;
+  &lt;/attributes&gt;
 &lt;/template&gt;
 </code></pre>
+        <p id="1e137867-803f-8062-aaa8-f1e399581145" class="">
+          replace /etc/phpldapadmin/templates/creation/posixAccount.xml with the
+          below
+        </p>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-8074-ad69-cf71b5b89ecf"
+          class="code"
+        ><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
+&lt;!DOCTYPE template SYSTEM &quot;../template.dtd&quot;&gt;
 
-      <p>
-        Replace
-        <code>/etc/phpldapadmin/templates/creation/posixAccount.xml</code>:
-      </p>
-      <pre><code>&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
-&lt;!DOCTYPE template SYSTEM "../template.dtd"&gt;
 &lt;template&gt;
-  &lt;askcontainer&gt;1&lt;/askcontainer&gt;
-  &lt;description&gt;New User Account&lt;/description&gt;
-  &lt;icon&gt;ldap-user.png&lt;/icon&gt;
-  ...
+&lt;askcontainer&gt;1&lt;/askcontainer&gt;
+&lt;description&gt;New User Account&lt;/description&gt;
+&lt;icon&gt;ldap-user.png&lt;/icon&gt;
+&lt;invalid&gt;0&lt;/invalid&gt;
+&lt;rdn&gt;cn&lt;/rdn&gt;
+&lt;!--&lt;regexp&gt;^ou=People,o=.*,&lt;/regexp&gt;--&gt;
+&lt;title&gt;Generic: User Account&lt;/title&gt;
+&lt;visible&gt;1&lt;/visible&gt;
+
+&lt;objectClasses&gt;
+&lt;objectClass id=&quot;inetOrgPerson&quot;&gt;&lt;/objectClass&gt;
+&lt;objectClass id=&quot;posixAccount&quot;&gt;&lt;/objectClass&gt;
+&lt;/objectClasses&gt;
+
+&lt;attributes&gt;
+&lt;attribute id=&quot;givenName&quot;&gt;
+	&lt;display&gt;First name&lt;/display&gt;
+	&lt;icon&gt;ldap-uid.png&lt;/icon&gt;
+	&lt;onchange&gt;=autoFill(cn;%givenName% %sn%)&lt;/onchange&gt;
+	&lt;onchange&gt;=autoFill(uid;%givenName|0-1/l%%sn/l%)&lt;/onchange&gt;
+	&lt;order&gt;1&lt;/order&gt;
+	&lt;page&gt;1&lt;/page&gt;
+&lt;/attribute&gt;
+&lt;attribute id=&quot;sn&quot;&gt;
+	&lt;display&gt;Last name&lt;/display&gt;
+	&lt;onchange&gt;=autoFill(cn;%givenName% %sn%)&lt;/onchange&gt;
+	&lt;onchange&gt;=autoFill(uid;%givenName|0-1/l%%sn/l%)&lt;/onchange&gt;
+	&lt;!-- &lt;onchange&gt;=autoFill(homeDirectory;/home/users/%uid|0-1/l%/%uid%)&lt;/onchange&gt; --&gt;
+	&lt;order&gt;2&lt;/order&gt;
+	&lt;page&gt;1&lt;/page&gt;
+&lt;/attribute&gt;
+&lt;attribute id=&quot;cn&quot;&gt;
+	&lt;display&gt;Common Name&lt;/display&gt;
+	&lt;order&gt;3&lt;/order&gt;
+	&lt;page&gt;1&lt;/page&gt;
+&lt;/attribute&gt;
+&lt;attribute id=&quot;uid&quot;&gt;
+	&lt;display&gt;User ID&lt;/display&gt;
+	&lt;onchange&gt;=autoFill(homeDirectory;/home/users/%uid%)&lt;/onchange&gt;
+	&lt;order&gt;4&lt;/order&gt;
+	&lt;page&gt;1&lt;/page&gt;
+	&lt;spacer&gt;1&lt;/spacer&gt;
+&lt;/attribute&gt;
+&lt;attribute id=&quot;homeDirectory&quot;&gt;
+	&lt;display&gt;Home directory&lt;/display&gt;
+	&lt;!-- &lt;onchange&gt;=autoFill(homeDirectory;/home/users/%gidNumber|0-0/T%/%uid|3-%)&lt;/onchange&gt; --&gt;
+	&lt;order&gt;8&lt;/order&gt;
+	&lt;page&gt;1&lt;/page&gt;
+&lt;/attribute&gt;
+&lt;attribute id=&quot;uidNumber&quot;&gt;
+	&lt;display&gt;UID Number&lt;/display&gt;
+	&lt;icon&gt;terminal.png&lt;/icon&gt;
+	&lt;order&gt;6&lt;/order&gt;
+	&lt;page&gt;1&lt;/page&gt;
+	&lt;readonly&gt;1&lt;/readonly&gt;
+	&lt;value&gt;=php.GetNextNumber(/;uidNumber)&lt;/value&gt;
+&lt;/attribute&gt;
+&lt;attribute id=&quot;loginShell&quot;&gt;
+	&lt;display&gt;Login shell&lt;/display&gt;
+	&lt;order&gt;9&lt;/order&gt;
+	&lt;page&gt;1&lt;/page&gt;
+	&lt;!-- &lt;value&gt;&lt;![CDATA[=php.PickList(/;(&amp;(objectClass=posixAccount));loginShell;%loginShell%;;;;loginShell)]]&gt;&lt;/value&gt; --&gt;
+	&lt;type&gt;select&lt;/type&gt;
+	&lt;value id=&quot;/bin/bash&quot;&gt;Bash&lt;/value&gt;
+	&lt;value id=&quot;/bin/csh&quot;&gt;C Shell&lt;/value&gt;
+	&lt;value id=&quot;/bin/dash&quot;&gt;Dash&lt;/value&gt;
+	&lt;value id=&quot;/bin/sh&quot;&gt;Shell&lt;/value&gt;
+	&lt;value id=&quot;/bin/tsh&quot;&gt;Turbo C Shell&lt;/value&gt;
+	&lt;value id=&quot;/bin/false&quot;&gt;False&lt;/value&gt;
+	&lt;value id=&quot;/usr/sbin/nologin&quot;&gt;No Login&lt;/value&gt;
+&lt;/attribute&gt;
+&lt;attribute id=&quot;userPassword&quot;&gt;
+	&lt;display&gt;Password&lt;/display&gt;
+	&lt;!-- &lt;helper&gt;
+		&lt;display&gt;Encryption&lt;/display&gt;
+		&lt;id&gt;enc&lt;/id&gt;
+		&lt;value&gt;=php.PasswordEncryptionTypes()&lt;/value&gt;
+	&lt;/helper&gt; --&gt;
+	&lt;icon&gt;lock.png&lt;/icon&gt;
+	&lt;order&gt;5&lt;/order&gt;
+	&lt;page&gt;1&lt;/page&gt;
+	&lt;post&gt;=php.PasswordEncrypt(%enc%;%userPassword%)&lt;/post&gt;
+	&lt;spacer&gt;1&lt;/spacer&gt;
+	&lt;verify&gt;1&lt;/verify&gt;
+&lt;/attribute&gt;
+&lt;/attributes&gt;
+
 &lt;/template&gt;
 </code></pre>
-    </section>
+        <h3 id="1e137867-803f-8037-b837-e4d90bf57c6a" class="">
+          Create OpenLDAP OU, Group and Users
+        </h3>
+        <p id="1e137867-803f-8003-b427-dd2568ee5f5f" class="">
+          in openldap create LDIF as below
+        </p>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-806e-ae96-d3a5add66e33"
+          class="code"
+        ><code class="language-Bash"># LDIF Export for dc=example,dc=com
+# Server: My LDAP Server (127.0.0.1)
+# Search Scope: sub
+# Search Filter: (objectClass=*)
+# Total Entries: 4
+#
+# Generated by phpLDAPadmin (http://phpldapadmin.sourceforge.net) on April 26, 2025 11:32 am
+# Version: 1.2.6.3
 
-    <section>
-      <h2>Create OpenLDAP OU, Group and Users</h2>
-      <p>Create an LDIF file with the following content:</p>
-      <pre><code>version: 1
+version: 1
 
+# Entry 1: dc=example,dc=com
 dn: dc=example,dc=com
 dc: example
 o: example
@@ -113,11 +1078,13 @@ objectclass: top
 objectclass: dcObject
 objectclass: organization
 
+# Entry 2: ou=users,dc=example,dc=com
 dn: ou=users,dc=example,dc=com
 objectclass: organizationalUnit
 objectclass: top
 ou: users
 
+# Entry 3: cn=duousers,ou=users,dc=example,dc=com
 dn: cn=duousers,ou=users,dc=example,dc=com
 cn: duousers
 member: cn=akram hamed,cn=duousers,ou=users,dc=example,dc=com
@@ -125,13 +1092,14 @@ member: cn=test test,cn=duousers,ou=users,dc=example,dc=com
 objectclass: groupOfNames
 objectclass: top
 
+# Entry 4: cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com
 dn: cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com
 cn: Akram Hamed
 gidnumber: 10001
 givenname: akram
 homedirectory: /home/users/akramhamed
 loginshell: /bin/bash
-mail: your@email.com
+mail: akramhamed@example.com
 objectclass: inetOrgPerson
 objectclass: posixAccount
 objectclass: top
@@ -140,14 +1108,193 @@ uid: akramhamed
 uidnumber: 10002
 userpassword: {MD5}z/MPgQifZ7M6lGWQDP0z1g==
 </code></pre>
-    </section>
-
-    <section>
-      <h2>Duo</h2>
-      <pre><code>su - root
+        <figure id="1e137867-803f-800b-a65a-eb9d8c94dd9c" class="image">
+          <a href="/assets/screenshots/ldap_server.png"
+            ><img
+              style="width: 692px"
+              src="/assets/screenshots/ldap_server.png"
+          /></a>
+        </figure>
+        <h3 id="1e137867-803f-8093-bf8c-ff0cc98b7920" class="">Duo</h3>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-8098-ae41-d1feeb8f54d6"
+          class="code"
+        ><code class="language-Bash">su - root
 apt-get install build-essential libffi-dev zlib1g-dev
 cd /root
+wget --content-disposition https://dl.duosecurity.com/duoauthproxy-latest-src.tgz
+tar xzf duoauthproxy-[TAB]
+cd duoauthproxy-version-src
+make
+cd duoauthproxy-build
+./install  --install-dir /opt/duoauthproxy --service-user duo_authproxy_svc --log-group duo_authproxy_grp --create-init-script yes</code></pre>
+        <p id="1e137867-803f-8051-8e8b-e8b8ab3661ba" class="">
+          add the External Directory as openldap in Duo admin panel, the conf
+          file /opt/duoauthproxy/conf/authproxy.cfg should be as below
+        </p>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-809b-aad4-d35f5197a551"
+          class="code"
+        ><code class="language-Bash">[cloud]
+ikey=DIMAHENUG1XMKZALS2FB
+skey=vDFkH6uUu1qs6NYjAYIuJpAknxBHWQ3R5vS2CrHk
+api_host=api-b2838f1a.duosecurity.com
+service_account_username=cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com
+service_account_password=@H0ME123f
+
+## below section to be used later for radius auth
+[ad_client]
+host=127.0.0.1
+port=389
+auth_type=plain
+bind_dn=cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com
+service_account_username=cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com
+service_account_password=@H0ME123f
+search_dn=dc=example,dc=com
+username_attribute=uid
+ssl_verify_hostname=false
+transport=clear</code></pre>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-80c2-b163-eed18780cb2a"
+          class="code"
+        ><code class="language-Bash">/opt/duoauthproxy/bin/authproxyctl restart</code></pre>
+        <h3 id="1e137867-803f-806a-8a62-f748884cedd3" class="">
+          Install Radius Client
+        </h3>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-80ff-948a-cf0628b2fbc9"
+          class="code"
+        ><code class="language-Bash">apt-get install freeradius-utils
 </code></pre>
-    </section>
+        <h3 id="1e137867-803f-80ef-88d9-e32e5bd2a5a5" class="">
+          Create a Duo application for the radius client
+        </h3>
+        <p id="1e137867-803f-8051-a69c-d416d6414e59" class="">
+          create a new Application in Duo admin panel with type “RADIUS”, add
+          the [radius_server_auto] section in
+          /opt/duoauthproxy/conf/authproxy.cfg
+        </p>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-80dd-b4f0-e6d8f316150f"
+          class="code"
+        ><code class="language-Bash">[radius_server_auto]
+ikey=DISLG2EL0V790855FRZV
+skey=mUvnGcPoViWH0D7QuDFRln4XyVfdOTF3c39xpJyq
+api_host=api-b2838f1a.duosecurity.com
+radius_ip_1=127.0.0.1
+radius_secret_1=cisco
+failmode=safe
+client=ad_client
+port=1812</code></pre>
+        <h3 id="1e137867-803f-80e0-9c77-f303c3720291" class="">
+          Test Radius client
+        </h3>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-8079-96a8-cc57d3e6a741"
+          class="code"
+        ><code class="language-Bash">radtest akramhamed @H0ME123f 127.0.0.1 1812 cisco</code></pre>
+        <p id="1e137867-803f-80d5-a2e0-c77fdc20bd70" class=""></p>
+        <h3 id="1e137867-803f-8010-9c7a-e23682a389bb" class="">Test tools</h3>
+        <script
+          src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
+          integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
+          integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer"
+        />
+        <pre
+          id="1e137867-803f-805a-b26a-e10c73dd382e"
+          class="code"
+        ><code class="language-Bash">ldapwhoami -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27;
+ldapsearch -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27; -b &quot;dc=example,dc=com&quot;
+root@debian:~# ldapwhoami -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27;
+radtest akramhamed @H0ME123f 127.0.0.1 1812 cisco</code></pre>
+      </div>
+    </article>
+    <span class="sans" style="font-size: 14px; padding-top: 2em"></span>
   </body>
 </html>
