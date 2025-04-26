@@ -126,12 +126,12 @@
           host OS is Debian Bookworm. Debian machine runs on 1 vcpu and 2GB RAM.
         </p>
         <p>
-          Radtest will simulate the radius client (like Anyconnect or
-          Forticlient or Globalprotect), request goes from the radius client to
-          the radius server (Duo Auth Proxy), then first to OpenLDAP (replacing
-          AD) for the primary authentication, then to Duo Mobile for the MFA. if
-          both challenges succeed, Duo Auth Proxy will reply to the Radius
-          client to let the user in.
+          Radtest will simulate the radius client (like FTD or Fortigate or
+          Paloalto, etc..), request goes from the radius client to the radius
+          server (Duo Auth Proxy), then first to OpenLDAP (replacing AD) for the
+          primary authentication, then to Duo Mobile for the MFA. if both
+          challenges succeed, Duo Auth Proxy will reply to the Radius client to
+          let the user in.
         </p>
         <h3>Overview on the steps covered</h3>
         <ol>
@@ -169,7 +169,7 @@ systemctl disable ufw
 systemctl stop apparmor
 systemctl disable apparmor.service
 apt-get install net-tools -y
-apt-get install apache2
+apt-get install apache2 -y
 systemctl start apache2
 systemctl enable apache2</code></pre>
         <h3>Install OpenLDAP and phpldapadmin (UI for OpenLDAP)</h3>
@@ -190,7 +190,9 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
         <p>
           empty the content of
           /etc/phpldapadmin/templates/creation/posixGroup.xml then fill it with
-          the below
+          the below. this is to prepare the group creation attributes as per Duo
+          prerequisites https://duo.com/docs/ldapsync#prerequisites specifically
+          the 'groupOfNames' attribute.
         </p>
         <pre><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;!DOCTYPE template SYSTEM &quot;template.dtd&quot;&gt;
@@ -226,7 +228,9 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
         <p>
           empty the content of
           /etc/phpldapadmin/templates/creation/posixAccount.xml then fill it
-          with the below
+          with the below. this is to prepare the user acount creation attributes
+          as per Duo prerequisites https://duo.com/docs/ldapsync#prerequisites .
+          specifically ignore Posix Groups.
         </p>
         <pre><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;!DOCTYPE template SYSTEM &quot;../template.dtd&quot;&gt;
@@ -322,7 +326,31 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
 &lt;/template&gt;
 </code></pre>
         <h3>Create OpenLDAP OU, Group and Users</h3>
-        <p>in openldap create LDIF as below</p>
+
+        <ol>
+          <li>
+            login to http://127.0.0.1/phpldapadmin/ with user
+            cn=admin,dc=example,dc=com and password used when the command
+            'dpkg-reconfigure slapd' was run
+          </li>
+          <li>create OU call it users in this example</li>
+          <li>create Generic Group and call it duousers in this example</li>
+          <li>
+            create a user account, call its anything, Akram Hamed in this
+            tutorial with password '@H0ME123f'
+          </li>
+          <li>details of the attributes are below</li>
+        </ol>
+
+        <figure class="image">
+          <a href="/assets/screenshots/ldap_server.png"
+            ><img
+              style="width: 692px"
+              src="/assets/screenshots/ldap_server.png"
+          /></a>
+        </figure>
+
+        <p>or create LDIF using import button and the template below</p>
         <pre><code class="language-Bash"># LDIF Export for dc=example,dc=com
 # Server: My LDAP Server (127.0.0.1)
 # Search Scope: sub
@@ -372,14 +400,9 @@ uid: akramhamed
 uidnumber: 10002
 userpassword: {MD5}z/MPgQifZ7M6lGWQDP0z1g==
 </code></pre>
-        <figure class="image">
-          <a href="/assets/screenshots/ldap_server.png"
-            ><img
-              style="width: 692px"
-              src="/assets/screenshots/ldap_server.png"
-          /></a>
-        </figure>
+
         <h3>Duo</h3>
+        <p>On the same Debian machine, we will now install Duo Auth Proxy</p>
         <pre><code class="language-Bash">su - root
 apt-get install build-essential libffi-dev zlib1g-dev
 cd /root
@@ -390,7 +413,9 @@ make
 cd duoauthproxy-build
 ./install  --install-dir /opt/duoauthproxy --service-user duo_authproxy_svc --log-group duo_authproxy_grp --create-init-script yes</code></pre>
         <p>
-          add the External Directory as openldap in Duo admin panel, the conf
+          signup here https://signup.duo.com/ if you havent done already, Go to
+          Users > External Directories > Add External Directory > OpenLDAP > Add
+          New Connection and take note of ikey, skey and apihostname. the conf
           file /opt/duoauthproxy/conf/authproxy.cfg should be as below
         </p>
         <pre><code class="language-Bash">[cloud]
@@ -413,14 +438,23 @@ username_attribute=uid
 ssl_verify_hostname=false
 transport=clear</code></pre>
         <pre><code class="language-Bash">/opt/duoauthproxy/bin/authproxyctl restart</code></pre>
+        <p>
+          for full reference of openldap sync with Auth Proxy refer to
+          https://duo.com/docs/ldapsync
+        </p>
         <h3>Install Radius Client</h3>
+        <p>
+          this will be used to simulate a request generating from any radius
+          client, like a firewall for example. where Duo Auth Proxy is the
+          Radius/AAA server.
+        </p>
         <pre><code class="language-Bash">apt-get install freeradius-utils
 </code></pre>
         <h3>Create a Duo application for the radius client</h3>
         <p>
-          create a new Application in Duo admin panel with type “RADIUS”, add
-          the [radius_server_auto] section in
-          /opt/duoauthproxy/conf/authproxy.cfg
+          In Duo admin panel, Applications > Protect and Application > Radius.
+          note the ikey, skey and apihostname. add the [radius_server_auto]
+          section in /opt/duoauthproxy/conf/authproxy.cfg
         </p>
         <pre><code class="language-Bash">[radius_server_auto]
 ikey=PASTE HERE
@@ -432,6 +466,14 @@ failmode=safe
 client=ad_client
 port=1812</code></pre>
         <h3>Test Radius client</h3>
+        <p>
+          note that Duo uses uid attribute of the user, which in our case is
+          akramhamed (check the LDIF file in our example). also note the line
+          "username_attribute=uid" in the authproxy.cfg file. below radtest
+          client simulates a login from radius client (like FTD or ASA or
+          Fortigate, etc..) to the Auth Proxy. Duo Mobile should get a push to
+          approve if everything is OK.
+        </p>
         <pre><code class="language-Bash">radtest akramhamed @H0ME123f 127.0.0.1 1812 cisco</code></pre>
         <h3>Test tools</h3>
         <pre><code class="language-Bash">ldapwhoami -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27;
