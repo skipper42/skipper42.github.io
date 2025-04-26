@@ -32,6 +32,7 @@
       h3 {
         color: #0056b3;
         margin-top: 2rem;
+        margin-bottom: 1rem;
       }
 
       a {
@@ -44,12 +45,12 @@
       }
 
       pre {
-        background: #282c34;
-        color: #f8f8f2;
+        background: #1e1e1e;
+        color: #d4d4d4;
         padding: 1rem;
-        border-radius: 8px;
+        border-radius: 10px;
         overflow-x: auto;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         font-family: "Courier New", Courier, monospace;
       }
 
@@ -87,42 +88,70 @@
 
       p {
         margin: 1rem 0;
-        font-size: 13px;
-        font-family: monospace;
-        color: #0070f3;
-        background-color: #f0f8ff;
-        padding: 8px 12px;
-        border-radius: 6px;
+        font-size: 14px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 8px;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 1rem;
+          font-size: 14px;
+        }
+        .page-title {
+          font-size: 1.5rem;
+        }
+        pre {
+          font-size: 0.85rem;
+        }
+        img {
+          width: 100%;
+          height: auto;
+        }
       }
     </style>
   </head>
   <body>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
-      integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css"
-      integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
     <article class="page sans">
       <header>
         <h1 class="page-title">OpenLDAP and AuthProxy on Debian</h1>
-        <p class="page-description"></p>
       </header>
       <div class="page-body">
-        <h3>Assumptions</h3>
+        <h3>Requirements</h3>
         <p>
-          Domain used will be example.com and password will be @H0ME123f and all
-          tests are run on Debian OS Bookworm. Debian machine runs on 1 vcpu and
-          2GB RAM. Radtest will simulate the radius client (like firewall),
-          OpenLDAP will be used to simulate AD.
+          Domain used will be example.com and all passwords will be '@H0ME123f',
+          host OS is Debian Bookworm. Debian machine runs on 1 vcpu and 2GB RAM.
         </p>
+        <p>
+          Radtest will simulate the radius client (like Anyconnect or
+          Forticlient or Globalprotect), request goes from the radius client to
+          the radius server (Duo Auth Proxy), then first to OpenLDAP (replacing
+          AD) for the primary authentication, then to Duo Mobile for the MFA. if
+          both challenges succeed, Duo Auth Proxy will reply to the Radius
+          client to let the user in.
+        </p>
+        <h3>Overview on the steps covered</h3>
+        <ol>
+          <li>Install Debian Machine</li>
+          <li>Install and configure OpenLDAP</li>
+          <li>Install and configure phpLDAPadmin</li>
+          <li>Replace openldap templates for groups and users</li>
+          <li>Create Organizational Units and Groups</li>
+          <li>Install Duo Authentication Proxy</li>
+          <li>Configure Duo Auth Proxy with OpenLDAP</li>
+          <li>Test using Radius Client</li>
+        </ol>
+
+        <figure class="image">
+          <a href="/assets/screenshots/duo_radius_diagram.png"
+            ><img
+              style="width: 692px"
+              src="/assets/screenshots/duo_radius_diagram.png"
+          /></a>
+        </figure>
 
         <h3>Debian</h3>
         <p>
@@ -143,7 +172,7 @@ apt-get install net-tools -y
 apt-get install apache2
 systemctl start apache2
 systemctl enable apache2</code></pre>
-        <h3>phpldapadmin</h3>
+        <h3>Install OpenLDAP and phpldapadmin (UI for OpenLDAP)</h3>
         <pre><code class="language-Bash">su - root
 apt-get install slapd ldap-utils
 systemctl start slapd
@@ -151,15 +180,17 @@ systemctl enable slapd
 dpkg-reconfigure slapd
 apt-get install phpldapadmin</code></pre>
         <p>
-          edit /etc/phpldapadmin/config.php to make these 3 lines as below, note
-          that second line will be commented, and thurd line will be uncommented
+          edit /etc/phpldapadmin/config.php look for these 3 lines and edit them
+          as below, note that second line will be commented, and third line will
+          be uncommented
         </p>
         <pre><code class="language-Bash">$servers-&gt;setValue(&#x27;server&#x27;,&#x27;base&#x27;, array(&#x27;dc=example,dc=com&#x27;));
 #$servers-&gt;setValue(&#x27;login&#x27;,&#x27;bind_id&#x27;,&#x27;cn=admin,dc=example,dc=com&#x27;);
 $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</code></pre>
         <p>
-          replace /etc/phpldapadmin/templates/creation/posixGroup.xml with the
-          below
+          empty the content of
+          /etc/phpldapadmin/templates/creation/posixGroup.xml then fill it with
+          the below
         </p>
         <pre><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;!DOCTYPE template SYSTEM &quot;template.dtd&quot;&gt;
@@ -193,8 +224,9 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
 &lt;/template&gt;
 </code></pre>
         <p>
-          replace /etc/phpldapadmin/templates/creation/posixAccount.xml with the
-          below
+          empty the content of
+          /etc/phpldapadmin/templates/creation/posixAccount.xml then fill it
+          with the below
         </p>
         <pre><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;!DOCTYPE template SYSTEM &quot;../template.dtd&quot;&gt;
