@@ -91,14 +91,20 @@
     </style>
   </head>
   <body>
-    <article id="1e137867-803f-80f8-abb1-ef2ca8f3190b" class="page sans">
+    <article class="page sans">
       <header>
         <h1 class="page-title">OpenLDAP and AuthProxy on Debian</h1>
         <p class="page-description"></p>
       </header>
       <div class="page-body">
-        <h3 id="1e137867-803f-804c-b9c1-d4f70257a9d0" class="">Debian</h3>
-        <p id="1e137867-803f-80bb-b4e1-fde2c4c886e9" class="">
+        <h3 class="">Assumptions</h3>
+        <p class="">
+          Domain used will be example.com and password will be @H0ME123f and all
+          tests are run on Debian OS Bookworm.
+        </p>
+
+        <h3 class="">Debian</h3>
+        <p class="">
           install Debian machine, from
           <a
             href="https://cdimage.debian.org/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.10.0-amd64-gnome.iso"
@@ -118,10 +124,7 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
         />
-        <pre
-          id="1e137867-803f-8083-9279-e95bad48f830"
-          class="code"
-        ><code class="language-Bash">su - root
+        <pre class="code"><code class="language-Bash">su - root
 apt-get update
 apt-get upgrade -y
 systemctl stop ufw
@@ -132,7 +135,7 @@ apt-get install net-tools -y
 apt-get install apache2
 systemctl start apache2
 systemctl enable apache2</code></pre>
-        <h3 id="1e137867-803f-805c-9ebf-ed84d065df6b" class="">phpldapadmin</h3>
+        <h3 class="">phpldapadmin</h3>
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
           integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
@@ -146,18 +149,13 @@ systemctl enable apache2</code></pre>
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
         />
-        <pre
-          id="1e137867-803f-80d9-9d8f-f748a3e9194e"
-          class="code"
-        ><code class="language-Bash">su - root
+        <pre class="code"><code class="language-Bash">su - root
 apt-get install slapd ldap-utils
 systemctl start slapd
 systemctl enable slapd
 dpkg-reconfigure slapd
 apt-get install phpldapadmin</code></pre>
-        <p id="1e137867-803f-80cb-813c-f4a9566475ef" class="">
-          edit /etc/phpldapadmin/config.php to be as follows
-        </p>
+        <p class="">edit /etc/phpldapadmin/config.php to be as follows</p>
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
           integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
@@ -172,12 +170,11 @@ apt-get install phpldapadmin</code></pre>
           referrerpolicy="no-referrer"
         />
         <pre
-          id="1e137867-803f-8051-8274-ca47e6945189"
           class="code"
         ><code class="language-Bash">$servers-&gt;setValue(&#x27;server&#x27;,&#x27;base&#x27;, array(&#x27;dc=example,dc=com&#x27;));
 #$servers-&gt;setValue(&#x27;login&#x27;,&#x27;bind_id&#x27;,&#x27;cn=admin,dc=example,dc=com&#x27;);
 $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</code></pre>
-        <p id="1e137867-803f-804e-a448-ca7972ab9bff" class="">
+        <p class="">
           replace /etc/phpldapadmin/templates/creation/posixGroup.xml with the
           below
         </p>
@@ -195,7 +192,6 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
           referrerpolicy="no-referrer"
         />
         <pre
-          id="1e137867-803f-80e6-8783-da8532cf490f"
           class="code"
         ><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;!DOCTYPE template SYSTEM &quot;template.dtd&quot;&gt;
@@ -228,7 +224,7 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
   &lt;/attributes&gt;
 &lt;/template&gt;
 </code></pre>
-        <p id="1e137867-803f-8062-aaa8-f1e399581145" class="">
+        <p class="">
           replace /etc/phpldapadmin/templates/creation/posixAccount.xml with the
           below
         </p>
@@ -246,7 +242,6 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
           referrerpolicy="no-referrer"
         />
         <pre
-          id="1e137867-803f-8074-ad69-cf71b5b89ecf"
           class="code"
         ><code class="language-Bash">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
 &lt;!DOCTYPE template SYSTEM &quot;../template.dtd&quot;&gt;
@@ -341,12 +336,8 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
 
 &lt;/template&gt;
 </code></pre>
-        <h3 id="1e137867-803f-8037-b837-e4d90bf57c6a" class="">
-          Create OpenLDAP OU, Group and Users
-        </h3>
-        <p id="1e137867-803f-8003-b427-dd2568ee5f5f" class="">
-          in openldap create LDIF as below
-        </p>
+        <h3 class="">Create OpenLDAP OU, Group and Users</h3>
+        <p class="">in openldap create LDIF as below</p>
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
           integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
@@ -361,7 +352,6 @@ $config-&gt;custom-&gt;appearance[&#x27;hide_template_warning&#x27;] = true;</co
           referrerpolicy="no-referrer"
         />
         <pre
-          id="1e137867-803f-806e-ae96-d3a5add66e33"
           class="code"
         ><code class="language-Bash"># LDIF Export for dc=example,dc=com
 # Server: My LDAP Server (127.0.0.1)
@@ -412,14 +402,14 @@ uid: akramhamed
 uidnumber: 10002
 userpassword: {MD5}z/MPgQifZ7M6lGWQDP0z1g==
 </code></pre>
-        <figure id="1e137867-803f-800b-a65a-eb9d8c94dd9c" class="image">
+        <figure class="image">
           <a href="/assets/screenshots/ldap_server.png"
             ><img
               style="width: 692px"
               src="/assets/screenshots/ldap_server.png"
           /></a>
         </figure>
-        <h3 id="1e137867-803f-8093-bf8c-ff0cc98b7920" class="">Duo</h3>
+        <h3 class="">Duo</h3>
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
           integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
@@ -433,10 +423,7 @@ userpassword: {MD5}z/MPgQifZ7M6lGWQDP0z1g==
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
         />
-        <pre
-          id="1e137867-803f-8098-ae41-d1feeb8f54d6"
-          class="code"
-        ><code class="language-Bash">su - root
+        <pre class="code"><code class="language-Bash">su - root
 apt-get install build-essential libffi-dev zlib1g-dev
 cd /root
 wget --content-disposition https://dl.duosecurity.com/duoauthproxy-latest-src.tgz
@@ -445,7 +432,7 @@ cd duoauthproxy-version-src
 make
 cd duoauthproxy-build
 ./install  --install-dir /opt/duoauthproxy --service-user duo_authproxy_svc --log-group duo_authproxy_grp --create-init-script yes</code></pre>
-        <p id="1e137867-803f-8051-8e8b-e8b8ab3661ba" class="">
+        <p class="">
           add the External Directory as openldap in Duo admin panel, the conf
           file /opt/duoauthproxy/conf/authproxy.cfg should be as below
         </p>
@@ -462,10 +449,7 @@ cd duoauthproxy-build
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
         />
-        <pre
-          id="1e137867-803f-809b-aad4-d35f5197a551"
-          class="code"
-        ><code class="language-Bash">[cloud]
+        <pre class="code"><code class="language-Bash">[cloud]
 ikey=DIMAHENUG1XMKZALS2FB
 skey=vDFkH6uUu1qs6NYjAYIuJpAknxBHWQ3R5vS2CrHk
 api_host=api-b2838f1a.duosecurity.com
@@ -498,12 +482,9 @@ transport=clear</code></pre>
           referrerpolicy="no-referrer"
         />
         <pre
-          id="1e137867-803f-80c2-b163-eed18780cb2a"
           class="code"
         ><code class="language-Bash">/opt/duoauthproxy/bin/authproxyctl restart</code></pre>
-        <h3 id="1e137867-803f-806a-8a62-f748884cedd3" class="">
-          Install Radius Client
-        </h3>
+        <h3 class="">Install Radius Client</h3>
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
           integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
@@ -518,14 +499,11 @@ transport=clear</code></pre>
           referrerpolicy="no-referrer"
         />
         <pre
-          id="1e137867-803f-80ff-948a-cf0628b2fbc9"
           class="code"
         ><code class="language-Bash">apt-get install freeradius-utils
 </code></pre>
-        <h3 id="1e137867-803f-80ef-88d9-e32e5bd2a5a5" class="">
-          Create a Duo application for the radius client
-        </h3>
-        <p id="1e137867-803f-8051-a69c-d416d6414e59" class="">
+        <h3 class="">Create a Duo application for the radius client</h3>
+        <p class="">
           create a new Application in Duo admin panel with type “RADIUS”, add
           the [radius_server_auto] section in
           /opt/duoauthproxy/conf/authproxy.cfg
@@ -543,10 +521,7 @@ transport=clear</code></pre>
           crossorigin="anonymous"
           referrerpolicy="no-referrer"
         />
-        <pre
-          id="1e137867-803f-80dd-b4f0-e6d8f316150f"
-          class="code"
-        ><code class="language-Bash">[radius_server_auto]
+        <pre class="code"><code class="language-Bash">[radius_server_auto]
 ikey=DISLG2EL0V790855FRZV
 skey=mUvnGcPoViWH0D7QuDFRln4XyVfdOTF3c39xpJyq
 api_host=api-b2838f1a.duosecurity.com
@@ -555,9 +530,7 @@ radius_secret_1=cisco
 failmode=safe
 client=ad_client
 port=1812</code></pre>
-        <h3 id="1e137867-803f-80e0-9c77-f303c3720291" class="">
-          Test Radius client
-        </h3>
+        <h3 class="">Test Radius client</h3>
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
           integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
@@ -572,11 +545,10 @@ port=1812</code></pre>
           referrerpolicy="no-referrer"
         />
         <pre
-          id="1e137867-803f-8079-96a8-cc57d3e6a741"
           class="code"
         ><code class="language-Bash">radtest akramhamed @H0ME123f 127.0.0.1 1812 cisco</code></pre>
-        <p id="1e137867-803f-80d5-a2e0-c77fdc20bd70" class=""></p>
-        <h3 id="1e137867-803f-8010-9c7a-e23682a389bb" class="">Test tools</h3>
+        <p class=""></p>
+        <h3 class="">Test tools</h3>
         <script
           src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"
           integrity="sha512-7Z9J3l1+EYfeaPKcGXu3MS/7T+w19WtKQY/n+xzmw4hZhJ9tyYmcUS+4QqAlzhicE5LAfMQSF3iFTK9bQdTxXg=="
@@ -591,7 +563,6 @@ port=1812</code></pre>
           referrerpolicy="no-referrer"
         />
         <pre
-          id="1e137867-803f-805a-b26a-e10c73dd382e"
           class="code"
         ><code class="language-Bash">ldapwhoami -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27;
 ldapsearch -x -H ldap://127.0.0.1 -D &quot;cn=Akram Hamed,cn=duousers,ou=users,dc=example,dc=com&quot; -w &#x27;@H0ME123f&#x27; -b &quot;dc=example,dc=com&quot;
