@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://git.yappit.org/</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://git.yappit.org/partners.html</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://git.yappit.org/cisco_secure/secure_firewall.html</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://git.yappit.org/cisco_secure/secure_workload.html</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://git.yappit.org/cisco_secure/email.html</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://git.yappit.org/cisco_secure/xdr.html</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://git.yappit.org/cisco_secure/umbrella.html</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://git.yappit.org/cisco_secure/duo.html</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://git.yappit.org/cisco_secure/duo_tutorial.html</loc>
+  <lastmod>2025-11-06T04:17:21+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+
+
+</urlset>
