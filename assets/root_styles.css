@@ -15,7 +15,9 @@ body {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
-
+section {
+  scroll-margin-top: 80px; /* adjust to navbar height */
+}
 .section-border {
   border-bottom: 1px solid #ccc;
   padding-bottom: 15px;
