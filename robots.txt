@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://git.yappit.org/sitemap.xml
+Sitemap: https://yappit.org/sitemap.xml
