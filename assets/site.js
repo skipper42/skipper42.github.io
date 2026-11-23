@@ -64,4 +64,49 @@ gtag("config", "G-CM32EKQ7KM");
     },
     { passive: true }
   );
+
+  // Structured GA4 resource click tracking (top useful links & product sections)
+  const main = document.querySelector("main");
+  if (main) {
+    main.addEventListener("click", function (event) {
+      const link = event.target.closest("a[href]");
+      if (!link) return;
+      const rawHref = (link.getAttribute("href") || "").trim();
+      if (!rawHref || rawHref.startsWith("#")) return;
+
+      const section = link.closest("section");
+      let sectionName = "General";
+      if (section) {
+        const h2 = section.querySelector("h2");
+        if (h2) {
+          sectionName = h2.textContent.trim();
+        } else if (section.id) {
+          sectionName = section.id.charAt(0).toUpperCase() + section.id.slice(1);
+        }
+      }
+
+      let categoryName = "";
+      const listEl = link.closest("section > ul");
+      if (listEl) {
+        let prev = listEl.previousElementSibling;
+        while (prev && prev.tagName !== "H2") {
+          if (prev.tagName === "H3") {
+            categoryName = prev.textContent.trim();
+            break;
+          }
+          prev = prev.previousElementSibling;
+        }
+      }
+
+      const title = (link.textContent || "").replace(/\s+/g, " ").trim() || rawHref;
+      const url = link.href || rawHref;
+
+      gtag("event", "resource_click", {
+        resource_section: sectionName.slice(0, 100),
+        resource_category: (categoryName || "General").slice(0, 100),
+        resource_title: title.slice(0, 100),
+        resource_url: url.slice(0, 100),
+      });
+    });
+  }
 })();
