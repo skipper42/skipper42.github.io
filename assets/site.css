@@ -240,12 +240,18 @@ main > section:last-of-type {
   margin: 0;
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.25rem 0.75rem;
+  gap: 0.15rem 0.5rem;
+  align-items: baseline;
 }
 
 .contact-list dt {
   font-weight: 700;
   color: var(--heading);
+  white-space: nowrap;
+}
+
+.contact-list dt::after {
+  content: ":";
 }
 
 .contact-list dd {
@@ -346,7 +352,7 @@ main > section:last-of-type {
   width: auto;
 }
 
-/* Mobile Navigation Drawer (active when JS is enabled; graceful wrap if JS off) */
+/* Mobile Navigation Overlay Dropdown (active when JS is enabled; graceful wrap if JS off) */
 @media (max-width: 719px) {
   .js .nav-toggle {
     display: inline-flex;
@@ -354,11 +360,16 @@ main > section:last-of-type {
 
   .js .nav-links {
     display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
     flex-direction: column;
-    width: 100%;
     gap: 0;
-    padding-top: 0.5rem;
+    padding: 0.4rem 1.25rem 0.75rem;
+    background-color: var(--nav-bg);
     border-top: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
   }
 
   .js .site-nav.is-open .nav-links {
@@ -377,26 +388,22 @@ main > section:last-of-type {
     padding: 0.7rem 1rem;
   }
 
+  .js .nav-links {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   main {
     padding: 1.25rem 1rem 1.5rem;
   }
 
   .profile {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.9rem;
   }
 
   .avatar {
     max-width: 180px;
-  }
-
-  .contact-list {
-    grid-template-columns: 1fr;
-    gap: 0.1rem;
-  }
-
-  .contact-list dd {
-    margin-bottom: 0.45rem;
   }
 }
 
