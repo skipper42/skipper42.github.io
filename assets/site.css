@@ -36,7 +36,7 @@
   --link: #0066cc;
   --border: #cccccc;
   --border-subtle: #dddddd;
-  --max-width: 960px;
+  --max-width: clamp(960px, 70vw, 1440px);
 }
 
 *,
