@@ -315,9 +315,13 @@ main > section:last-of-type {
 }
 
 .disclaimer {
-  font-size: 0.82rem;
-  color: var(--muted);
-  line-height: 1.5;
+  background-color: var(--nav-bg);
+  color: #f1f3f5;
+  border-left: 4px solid #4da3ff;
+  border-radius: 4px;
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
 .product-jump {
